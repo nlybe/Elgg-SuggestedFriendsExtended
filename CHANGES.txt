@@ -1,0 +1,5 @@
+CHANGE LOG
+
+1.8.0	(12 October 2013)
+-------------------------------- 
+Initial release 
