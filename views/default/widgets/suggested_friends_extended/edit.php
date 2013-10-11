@@ -7,6 +7,16 @@
  */
 
 //
+// number of results
+echo elgg_echo('suggested_friends_extended:how:many') . "<br>";
+$options['name'] = 'params[num_display]';
+$options['value'] = $vars['entity']->num_display ? $vars['entity']->num_display : SUGGESTED_FRIENDS_LIMIT;
+$options['options_values'] = array(1,2,3,4,5,6,7,8,9,10);
+
+echo elgg_view('input/dropdown', $options);
+
+
+/*
 // select for friends  
 echo elgg_echo('suggested_friends_extended:friends:only') . "<br>";
 $options = array(
@@ -28,13 +38,6 @@ $options['name'] = 'params[look_in_groups]';
 $options['value'] = $vars['entity']->look_in_groups ? $vars['entity']->look_in_groups : "yes";
 
 echo elgg_view('input/dropdown', $options) . "<br><br>";
+*/
 
 
-//
-// number of results
-echo elgg_echo('suggested_friends_extended:how:many') . "<br>";
-$options['name'] = 'params[num_display]';
-$options['value'] = $vars['entity']->num_display ? $vars['entity']->num_display : 2;
-$options['options_values'] = array(1,2,3,4,5,6,7,8,9,10);
-
-echo elgg_view('input/dropdown', $options);

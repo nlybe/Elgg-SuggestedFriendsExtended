@@ -12,6 +12,8 @@ require_once 'lib/functions.php';
 
 // plugin init
 function suggested_friends_extended_init() {
+	define('SUGGESTED_FRIENDS_LIMIT', 10);	// set max limit on suggested friends
+	define('GENERAL_NON_FRIENDS_LIMIT', 2000);	// set max limit on general users search. It can be modified depending the total number of users
 
 	elgg_register_library('elgg:suggested_friends_extended', elgg_get_plugins_path() . 'suggested_friends_extended/lib/Geocodersfe.php');
 	

@@ -1,5 +1,9 @@
 CHANGE LOG
 
-1.8.0	(12 October 2013)
+1.8.1	(11 October 2013)
+-------------------------------- 
+- performance improvements 
+
+1.8.0	(10 October 2013)
 -------------------------------- 
 Initial release 

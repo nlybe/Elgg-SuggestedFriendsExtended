@@ -24,10 +24,14 @@ function suggested_friends_extended_sorter($a, $b){
  * @param Int $groups_limit
  * @return Array
  */      
-function suggested_friends_extended_get_people($guid, $friends_of_friends_limit = 3, $groups_members_limit = 3) {
+function suggested_friends_extended_get_people($guid, $sfe_limit = SUGGESTED_FRIENDS_LIMIT) {
 
 	global $CONFIG;
 	$user = get_user($guid);
+	
+	if (!is_numeric($sfe_limit) || !($sfe_limit > 0)) 	{
+		$sfe_limit = SUGGESTED_FRIENDS_LIMIT;
+	}	
 
 	// retrieve all users friends
 	$options = array(
@@ -50,23 +54,11 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 	}
 	$in = implode(',', $in);
 
-	// retrieve all non users friends
-	$options_non = array(
-		'type' => 'user',
-		'limit' => 0,
-		'wheres' => array(
-			"u.banned = 'no'",
-			"e.guid NOT IN ($in)"
-		),	
-		'joins' => "INNER JOIN {$CONFIG->dbprefix}users_entity u USING (guid)",			
-	);		
-	$get_non_user_friends = elgg_get_entities_from_metadata($options_non);
-
 	$people = array();
 
 	/* seach by friends */
 	
-	if ($friends_of_friends_limit > 0) {
+	if ($sfe_limit > 0) {
 		foreach ($friends as $friend) {
 			// retrieve friends of each friend (discarding the users friends)
 			$fof = elgg_get_entities_from_relationship(array(
@@ -79,7 +71,7 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 				),
 				'joins' => "INNER JOIN {$CONFIG->dbprefix}users_entity u USING (guid)",
 				'order_by' => 'u.last_action DESC',
-				'limit' => $friends_of_friends_limit
+				'limit' => $sfe_limit
 			));
 			if (is_array($fof) && count($fof) > 0) {
 				// populate $people
@@ -111,7 +103,7 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 	{
 		$options = array(
 			'type' => 'user',
-			'limit' => 0,
+			'limit' => $sfe_limit,
 			'wheres' => array(
 				"u.banned = 'no'",
 				"e.guid NOT IN ($in)"
@@ -153,7 +145,7 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 	if (!empty($sfe_age) && $sfe_age === 'yes' && !empty($user->age))	{
 		$options = array(
 			'type' => 'user',
-			'limit' => 0,
+			'limit' => $sfe_limit,
 			'wheres' => array(
 				"u.banned = 'no'",
 				"e.guid NOT IN ($in)"
@@ -192,7 +184,7 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 	if (!empty($sfe_location) && $sfe_location === 'yes' && !empty($user->location))	{
 		$options = array(
 			'type' => 'user',
-			'limit' => 0,
+			'limit' => $sfe_limit,
 			'wheres' => array(
 				"u.banned = 'no'",
 				"e.guid NOT IN ($in)"
@@ -235,8 +227,21 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 		if (is_numeric($sfe_radius)) 	{
 		
 			if ($sfe_radius_loc_unitmeas === 'miles') $sfe_radius = 1.609344*$sfe_radius;
-			
-			$get_users_by_radius_loc = $get_non_user_friends;
+
+			// retrieve all non users friends with non empty location
+			$options = array(
+				'type' => 'user',
+				'limit' => GENERAL_NON_FRIENDS_LIMIT,
+				'wheres' => array(
+					"u.banned = 'no'",
+					"e.guid NOT IN ($in)"
+				),	
+				'joins' => "INNER JOIN {$CONFIG->dbprefix}users_entity u USING (guid)",	
+				'metadata_name_value_pairs' => array(
+					array('name' => 'location','value' => '', 'operand' => '<>'),
+				),						
+			);		
+			$get_users_by_radius_loc = elgg_get_entities_from_metadata($options);	
 			
 			if (is_array($get_users_by_radius_loc) && count($get_users_by_radius_loc) > 0) {
 				// populate $people
@@ -277,8 +282,21 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 			array_walk($user_interests, 'trim_value');
 		}
 		
-		$get_users_by_interests = $get_non_user_friends;
-	
+		// retrieve all non users friends with non empty interests
+		$options = array(
+			'type' => 'user',
+			'limit' => GENERAL_NON_FRIENDS_LIMIT,
+			'wheres' => array(
+				"u.banned = 'no'",
+				"e.guid NOT IN ($in)"
+			),	
+			'joins' => "INNER JOIN {$CONFIG->dbprefix}users_entity u USING (guid)",	
+			'metadata_name_value_pairs' => array(
+				array('name' => 'interests','value' => '', 'operand' => '<>'),
+			),						
+		);	
+		$get_users_by_interests = elgg_get_entities_from_metadata($options);		
+		
 		$user_interests = array_values($user_interests);
 		foreach ($user_interests as $ui)
 		{
@@ -320,7 +338,7 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 	unset($friends);
 
 	/* search by groups */
-	if ($groups_members_limit > 0) {
+	if ($sfe_limit > 0) {
 		// retrieve ($groups_limit) user's groups
 		$options = array(
 			'type' => 'group',
@@ -346,7 +364,7 @@ function suggested_friends_extended_get_people($guid, $friends_of_friends_limit 
 					),
 					'joins' => "INNER JOIN {$CONFIG->dbprefix}users_entity u USING (guid)",
 					'order_by' => 'u.last_action DESC',
-					'limit' => $groups_members_limit
+					'limit' => $sfe_limit
 				));
 				if (is_array($members) && count($members) > 0) {
 					// populate $people
