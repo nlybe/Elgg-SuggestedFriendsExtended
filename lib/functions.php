@@ -24,7 +24,7 @@ function suggested_friends_extended_sorter($a, $b){
  * @param Int $groups_limit
  * @return Array
  */      
-function suggested_friends_extended_get_people($guid, $sfe_limit = SUGGESTED_FRIENDS_LIMIT) {
+function suggested_friends_extended_get_people($guid, $sfe_limit) {
 
 	global $CONFIG;
 	$user = get_user($guid);

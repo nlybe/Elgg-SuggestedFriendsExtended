@@ -11,7 +11,7 @@ $people = $vars['people'];
 if (is_array($people) && sizeof($people) > 0) {
 	
 	$sfe_how_many = trim(elgg_get_plugin_setting('sfe_how_many', 'suggested_friends_extended'));
-	if (!is_numeric($sfe_limit) || !($sfe_limit > 0)) 	{
+	if (!is_numeric($sfe_how_many) || !($sfe_how_many > 0)) 	{
 		$sfe_how_many = SUGGESTED_FRIENDS_LIMIT;
 	}
 

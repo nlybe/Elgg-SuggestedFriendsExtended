@@ -19,7 +19,7 @@ if (!is_numeric($sfe_limit) || !($sfe_limit > 0)) 	{
 	$sfe_limit = SUGGESTED_FRIENDS_LIMIT;
 }
 
-$people = suggested_friends_extended_get_people($page_owner->guid, $sfe_how_many);
+$people = suggested_friends_extended_get_people($page_owner->guid, $sfe_limit);
 
 $content = elgg_view('suggested_friends_extended/list', array('people' => $people));
 
