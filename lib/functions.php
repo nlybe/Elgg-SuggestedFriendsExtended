@@ -402,8 +402,8 @@ function trim_value(&$value)
 
 // Based on user location, save his coords. 
 function sfe_save_object_coords($location, $object) {
-	
-    $mapkey = trim(elgg_get_plugin_setting('google_api_key', 'suggested_friends_extended'));
+
+    $mapkey = trim(elgg_get_plugin_setting('sfe_google_api_key', 'suggested_friends_extended'));
     $geocoder = new Geocodersfe($mapkey);
 
     if ($location) {
@@ -412,7 +412,6 @@ function sfe_save_object_coords($location, $object) {
         }
         catch (Exception $ex) {
             system_message($ex->getMessage());
-            //exit;
         }   
 
         if (count($placemarks) > 0) { 
