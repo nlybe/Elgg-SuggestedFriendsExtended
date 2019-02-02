@@ -9,8 +9,7 @@
     class Geocodersfe
     {
         //public static $url = 'http://maps.google.com/maps/geo';
-        public static $url = 'http://maps.googleapis.com/maps/api/geocode/xml';
-
+        public static $url = 'https://maps.googleapis.com/maps/api/geocode/xml';
         const G_GEO_SUCCESS             = 'OK';
         const G_GEO_ZERO_RESULTS        = 'ZERO_RESULTS';
         const G_GEO_OVER_QUERY_LIMIT    = 'OVER_QUERY_LIMIT';
@@ -18,7 +17,7 @@
         const G_GEO_INVALID_REQUEST     = 'INVALID_REQUEST';
         const G_GEO_UNKNOWN_ADDRESS     = 'ZERO_RESULTS';
         const G_GEO_UNAVAILABLE_ADDRESS = 'ZERO_RESULTS';
-        
+
         protected $_apiKey;
 
         public function __construct($key)   //obs
@@ -28,22 +27,13 @@
 
         public function performRequest($search, $output = 'xml')
         {
-            /*
-            $url = sprintf('%s?q=%s&output=%s&key=%s&oe=utf-8',
+            $url = sprintf('%s?address=%s&key=%s',
                            self::$url,
-                           urlencode($search),
-                           $output,
-                           $this->_apiKey);
-             */
-            $url = sprintf('%s?address=%s&sensor=false',
-                           self::$url,
-                           urlencode($search));            
-
+                           urlencode($search), $this->_apiKey);
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $response = curl_exec($ch);
             curl_close($ch);
-
             return $response;
         }
 
@@ -51,9 +41,7 @@
         {
             $response = $this->performRequest($search, 'xml');
             $xml = new SimpleXMLElement($response);
-            //$status   = (int) $xml->Response->Status->code;
             $status   = $xml->status;
-//print_r($status);
 
             switch ($status) {
                 case self::G_GEO_SUCCESS:
@@ -73,7 +61,7 @@
                 case self::G_GEO_INVALID_REQUEST:
 					throw new Exception(sprintf($status, ''));
                 case self::G_GEO_UNKNOWN_ADDRESS:
-					throw new Exception(sprintf($status, '')); 		
+					throw new Exception(sprintf($status, ''));
                 case self::G_GEO_UNAVAILABLE_ADDRESS:
 					throw new Exception(sprintf($status, ''));
 
@@ -83,7 +71,7 @@
             }
         }
     }
-    
+
     class Placemarksfe
     {
         const ACCURACY_UNKNOWN      = 0;
@@ -140,14 +128,12 @@
             $point = Pointsfe::Create($xml->geometry->location->lng.','.$xml->geometry->location->lat);
             $placemark = new self;
             $placemark->setPoint($point);
-            //$placemark->setAddress($xml->address);
             $placemark->setAddress($xml->formatted_address);
-            //$placemark->setAccuracy($xml->AddressDetails['Accuracy']);
 
             return $placemark;
         }
-    }    
-    
+    }
+
     class Pointsfe
     {
         protected $_lat;
